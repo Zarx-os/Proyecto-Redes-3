@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file
 from red import Red
 import logging
+import os
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', handlers=[logging.FileHandler('app.log')])
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
@@ -33,9 +34,11 @@ def obtenerTopologia():
     red = Red(ip, name, user, password)
     
     # Leyendo la topologia
-    red.leerTopologia() # almacena en el archivo topologia.jpg
-    
-    return send_file('static/topologia.jpg')
+    if os.path.exists('static/topologia.jpg'):
+        return send_file('static/topologia.jpg' )
+    else:
+        red.leerTopologia() # almacena en el archivo topologia.jpg
+        return send_file('static/topologia.jpg')
 
 @app.get('/info-topologia')
 def obtenerInfoTopologia():
@@ -72,4 +75,4 @@ def monitorearInterfaz():
         return jsonify({"status": "Error monitoreando"}), 500        
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0', port=5020)

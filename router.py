@@ -18,9 +18,12 @@ class Router:
         self.direcciones={}
 
     def buscarVecinos(self, visited=set(), stack=[], child=''):
-        child = pexpect.spawn('telnet ' + self.ip)
-        child.expect('Username: ')
-        child.sendline(self.user)
+        #child = pexpect.spawn('telnet ' + self.ip)
+        #child.expect('Username: ')
+        #child.sendline(self.user)
+        #child.expect('Password: ')
+        #child.sendline(self.password)
+        child = pexpect.spawn('ssh '+self.user+'@'+ self.ip)
         child.expect('Password: ')
         child.sendline(self.password)
         child.expect('#')
@@ -45,14 +48,15 @@ class Router:
         
         di_ip=None
         if node not in visited:
-            if node != 'Enrutador-3':
+            if node != 'R3':
+                
                 if node in direcciones.keys():
                     di_ip=direcciones[node]
-                #print(di_ip)
-                child.sendline('telnet ' + di_ip[len(di_ip)-1])
+                #child.sendline('telnet ' + di_ip[len(di_ip)-1])
+                child.sendline('ssh -l '+self.user+' '+di_ip[len(di_ip)-1])
                 #print(di_ip[len(di_ip)-1])
-                child.expect('Username: ')
-                child.sendline(self.user)
+                #child.expect('Username: ')
+                #child.sendline(self.user)
                 child.expect('Password: ')
                 child.sendline(self.password)
                 #print('Conecto a '+node + ' ' + di_ip)
@@ -68,8 +72,9 @@ class Router:
             for neighbour in routers[node]: 
                 print(node+'->'+neighbour)
                 #print(stack)
-                if len(routers[node]) == 1:
-                    continue
+                
+                #if len(routers[node]) == 1:
+                #    continue
 
                 if stack[-1] != node:
                     while stack[-1] != node:
@@ -78,6 +83,8 @@ class Router:
                         child.expect('#')
 
                 self.dfs2(visited, routers, neighbour,direcciones,stack,child)
+
+                
 
             
 
@@ -93,12 +100,13 @@ class Router:
         tabla_dispositivos = child.before.decode().split()
 
         # Agrega a la lista si tiene la palabra Enrutador
-        conectados = [x for x in tabla_dispositivos if "Enrutador" in x]
+        #conectados = [x for x in tabla_dispositivos if "Enrutador" in x]
+        conectados = [str(re.search('(^R[0-9])+', w).group()) for w in tabla_dispositivos if re.search('(^R[0-9])+', w)]
         routers[node]=conectados
         
         for dispositivo in conectados:
             # Obtenemos la info del dispositivo
-            child.sendline('sh cdp entry ' + dispositivo)
+            child.sendline('sh cdp entry ' + dispositivo+'.adminredes.escom.ipn.mx')
             child.expect(node+"#")
             info_dispositivo = child.before.decode().split()
 

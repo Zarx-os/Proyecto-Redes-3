@@ -13,6 +13,15 @@
 
 <body>
     <div class="contenedor">
+        <div id="contenedor_user" class="user">
+            <h3>Credenciales</h3>
+            <input type="text" id="user" placeholder="Ingresa el usuario">
+            <input type="text" id="pass" placeholder="Ingresa la contrasena">
+            <div class="user-botones">
+                <button id="btn_acce">Acceder</button>
+                <button id="btn_can">Cancelar</button>
+            </div>
+        </div>
         <main class="main">
             <!-- Título -->
             <h1 class="Titulo"><a href="/">ADMINISTRADOR DE REDES</a></h1>
@@ -22,23 +31,27 @@
                 <div class="">
                     <!-- Titulo -->
                     <h2 id="titulo-seccion" class="">Topología</h2>
-
+                    <div class="botones-sup">
+                        <button id="demo">Explorar red</button>
+                        <button id="demo1">Actualizar</button>
+                    </div>
                     <!-- Topología -->
                     <div class="contenedor-img">
-                        <img src="" id="img-topo" alt="Topología de la red" class="">
+                        <img src="" id="img-topo">
                     </div>
                 </div>
-
+                
                 <!-- opciones de administración -->
                 <div class="contenedor-admin">
                     <h2 class="">Opciones de administración</h2>
                     <div class="botones">
-                        <button id=""><a href="/monitorear">Getionar usuarios</a></button>
-                        <button id=""><a href="/monitorear">Gestionar protocolos</a></button>
+
+                        <button id=""><a href="/monitorear">Enrutar interfaces</a></button>
                         <button id=""><a href="/monitorear">Cambiar configuracion MIB-II</a></button>
                         <button><a href="/monitorear" class="">Monitoriear interfaces</a></button>
                     </div>
                 </div>
+            </div>
         </main>
     </div>
     <script src="/static/scripts/main.js"></script>

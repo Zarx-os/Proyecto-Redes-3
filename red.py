@@ -23,6 +23,7 @@ class Red():
         #router_cercano = routersGraph(1,0,0,"admin","admin1234", child=None)
         # Generando gráfico
         plt.clf() # Limpiando imagen
+        #plt.figure(figsize=(6, 6))
         G = nx.Graph()
         for router in Grafico_red.keys(): # Agregando routers
             G.add_node(router, name=router)
@@ -31,6 +32,8 @@ class Red():
                 G.add_edge(r1,r2)
 
         nx.draw_networkx(G, with_labels=True, node_size=1000,node_color="skyblue", node_shape="s", alpha=0.8, linewidths=10) # Creando gráfico
+        plt.box(False)
+        plt.axis('off')
         plt.savefig("static/topologia.jpg")
     
     def obtenerRouters(self):

@@ -22,7 +22,7 @@ body{
     letter-spacing: -3px;
     transition: 700ms ease;
     font-variation-settings: "wght" 311;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.2rem;
     
     outline: none;
     text-align: center;
@@ -50,7 +50,16 @@ h1:hover {
     border: 0;
 }
 
-
+.botones-sup button{
+    padding: 4px;
+    background-color: #e63946;
+    color: white;
+    border: 0;
+    border-radius: 4px;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 0.4rem;
+}
 
 .botones a:visited {
     text-decoration: none;
@@ -73,4 +82,34 @@ h1:hover {
 .contenedor h1 > a:link, a:visited{
     color: #e63946;;
     
+}
+.user{
+    position:absolute;
+    z-index: 2;
+    display: none;
+    background-color: rgba(101, 235, 136, 0.8);
+    padding: 1.5rem;
+}
+.user h3{
+    font-family: Ubuntu,'Courier New', Courier, monospace;
+    margin-bottom: 0.4rem;
+
+}
+.user input{
+    height: 28px;
+    border: 0;
+    margin:0 5px;
+    padding: 0.1rem;
+}
+.user-botones{
+    width: 100%;
+    margin-top: 0.6rem;
+    text-align: right;
+}
+.user-botones button{
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
+    border: 0;
+    border-radius: 5px;
+    padding: 5px;
 }
