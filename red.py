@@ -18,8 +18,8 @@ class Red():
         # Obteniendo información de los routers
         Grafico_red,Grafico_direcciones = Router(self.ip, self.name, self.user, self.password).buscarVecinos(self.visited, self.stack)
         
-        print(Grafico_red)
-        print(Grafico_direcciones)
+        #print(Grafico_red)
+        #print(Grafico_direcciones)
         #router_cercano = routersGraph(1,0,0,"admin","admin1234", child=None)
         # Generando gráfico
         plt.clf() # Limpiando imagen
@@ -38,16 +38,3 @@ class Red():
     
     def obtenerRouters(self):
         return self.routers
-
-    def configurarSNMP(self, router):
-        if router in self.routers:
-            enrutador = Router(self.routers[router]["ip"], router, self.routers[router]["user"], self.routers[router]["password"])
-            enrutador.configurarSNMP()
-        else:
-            raise Exception("Router no encontrado")
-
-    def monitorear(self,router, interfaz, periodo):
-        if router in self.routers:
-            self.routers[router].monitorear(interfaz, periodo)
-        else:
-            raise Exception("Router no encontrado")

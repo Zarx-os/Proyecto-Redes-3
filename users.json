@@ -1,0 +1,62 @@
+{
+    "users": [
+        {
+            "router": "R3",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                }
+            ]
+        },
+        {
+            "router": "R4",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                }
+            ]
+        },
+        {
+            "router": "R2",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                },
+                {
+                    "username": "mauri",
+                    "privilege": "14"
+                }
+            ]
+        },
+        {
+            "router": "R1",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                }
+            ]
+        },
+        {
+            "router": "R5",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                }
+            ]
+        },
+        {
+            "router": "R6",
+            "users": [
+                {
+                    "username": "admin",
+                    "privilege": "15"
+                }
+            ]
+        }
+    ]
+}

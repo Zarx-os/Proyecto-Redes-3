@@ -1,7 +1,5 @@
 import pexpect
-import getpass
-import logging
-import time
+import json
 import re
 
 
@@ -18,14 +16,18 @@ class Router:
         self.direcciones={}
 
     def buscarVecinos(self, visited=set(), stack=[], child=''):
-        #child = pexpect.spawn('telnet ' + self.ip)
-        #child.expect('Username: ')
-        #child.sendline(self.user)
-        #child.expect('Password: ')
-        #child.sendline(self.password)
-        child = pexpect.spawn('ssh '+self.user+'@'+ self.ip)
+        #Seccion para hacerlo con Telnet
+        child = pexpect.spawn('telnet ' + self.ip)
+        child.expect('Username: ')
+        child.sendline(self.user)
         child.expect('Password: ')
         child.sendline(self.password)
+        
+        #Seccion para hacerlo con SSH
+        #child = pexpect.spawn('ssh '+self.user+'@'+ self.ip)
+        #child.expect('Password: ')
+        #child.sendline(self.password)
+        #------
         child.expect('#')
         child.sendline('sh run | i host')
         child.expect("#")
@@ -47,16 +49,22 @@ class Router:
     def dfs2(self,visited, routers, node ,direcciones , stack, child):
         
         di_ip=None
+        with open('data.json', "r") as f:
+            data=json.load(f)
+        host = data['name']
+
         if node not in visited:
-            if node != 'R3':
-                
+
+            if node != host:
                 if node in direcciones.keys():
                     di_ip=direcciones[node]
-                #child.sendline('telnet ' + di_ip[len(di_ip)-1])
-                child.sendline('ssh -l '+self.user+' '+di_ip[len(di_ip)-1])
+                #Linea para el telnet
+                child.sendline('telnet ' + di_ip[len(di_ip)-1])
+                #Linea para SSH
+                #child.sendline('ssh -l '+self.user+' '+di_ip[len(di_ip)-1])
                 #print(di_ip[len(di_ip)-1])
-                #child.expect('Username: ')
-                #child.sendline(self.user)
+                child.expect('Username: ')
+                child.sendline(self.user)
                 child.expect('Password: ')
                 child.sendline(self.password)
                 #print('Conecto a '+node + ' ' + di_ip)
@@ -106,7 +114,8 @@ class Router:
         
         for dispositivo in conectados:
             # Obtenemos la info del dispositivo
-            child.sendline('sh cdp entry ' + dispositivo+'.adminredes.escom.ipn.mx')
+            #child.sendline('sh cdp entry ' + dispositivo+'.adminredes.escom.ipn.mx')
+            child.sendline('sh cdp entry ' + dispositivo)
             child.expect(node+"#")
             info_dispositivo = child.before.decode().split()
 
@@ -126,26 +135,3 @@ class Router:
             # Examinamos los routers vecinos
 
         return routers,direcciones
-
-    def configurarSNMP(self):
-        mensaje = "Conectando a " + self.name
-        logging.debug(mensaje)
-
-        # """ Nos conectamos al router """
-        child = pexpect.spawn('telnet ' + self.ip)
-        child.expect('Username: ')
-        child.sendline(self.user)
-        child.expect('Password: ')
-        child.sendline(self.password)
-
-        # """ Configuramos el snmp"""
-        child.expect(self.name+">")
-        child.sendline("snpm-server comunity | i snmp")
-        child.expect(self.name+">")
-        child.sendline("snmp-server enable traps snmp linkdown linkup")
-        child.expect(self.name+">")
-        child.sendline("snmp-server host 192.168.1.3 version 2c comun_pruebas")
-        child.expect(self.name+">")
-
-    # def monitorear(self,intefaz, periodo):
-    #    pass
