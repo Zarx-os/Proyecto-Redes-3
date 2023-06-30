@@ -1,22 +1,73 @@
 from flask import Flask, request, jsonify, send_file
 from red import Red
-import logging
-import os
-import json
-import pexpect
-import re
-import time
-import  threading
 from router import Router
+from pysnmp.entity import engine, config
+from pysnmp.carrier.asyncore.dgram import udp
+from pysnmp.entity.rfc3413 import ntfrcv
+import logging,os,json,pexpect,re,time,threading
 
-# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', handlers=[logging.FileHandler('app.log')])
-logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+
 
 app = Flask(__name__)
 red = None
 
 stop_event = threading.Event()
 interval = 5 * 60 
+# Variable de control para detener el hilo
+detener_hilo = False
+snmpEngine = engine.SnmpEngine()
+
+TrapAgentAddress='192.168.0.10'; #Direccion del escucha de traps
+Port=162;  #Puerto
+
+logging.basicConfig(filename='traps_recibidas.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+
+config.addTransport(
+        snmpEngine,
+        udp.domainName + (1,),
+        udp.UdpTransport().openServerMode((TrapAgentAddress, Port))
+    )
+
+# Configuracion de comunidad V1 y V2c
+config.addV1System(snmpEngine, 'todo', 'lectura')
+
+
+def traps():
+    global detener_hilo
+    while not detener_hilo:
+        logging.info("El gestor esta escuchando SNMP Traps en "+TrapAgentAddress+" , Puerto : " +str(Port))
+        logging.info('--------------------------------------------------------------------------')
+
+        print("El gestor esta escuchando SNMP Traps en "+TrapAgentAddress+" , Puerto : " +str(Port));
+        ntfrcv.NotificationReceiver(snmpEngine, cbFun)
+        snmpEngine.transportDispatcher.jobStarted(1)  
+        try:
+            snmpEngine.transportDispatcher.runDispatcher()
+        except:
+            snmpEngine.transportDispatcher.closeDispatcher()
+            raise
+    print("Fin de la función")
+
+
+thread = threading.Thread(target=traps)
+def is_demonio_running():
+
+# Comprobar si el hilo está en ejecución
+    if thread.is_alive():
+        print("El hilo está en ejecución")
+        return True
+    else:
+        return False
+   
+def cbFun(snmpEngine, stateReference, contextEngineId, contextName,varBinds, cbCtx):
+    print("Mensaje nuevo de traps recibido");
+    logging.info("Mensaje nuevo de traps recibido")
+    for name, val in varBinds:   
+        logging.info('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
+        print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
+
+    logging.info("==== Fin del mensaje de la trampa ====")
+
 
 def ssh_command(ip, username, password, command):
     ssh = paramiko.SSHClient()
@@ -948,11 +999,37 @@ def obtenerTopologia():
     
     # Leyendo la topologia
     if os.path.exists('static/topologia.jpg'):
+        red.leerTopologia() 
         return send_file('static/topologia.jpg' )
     else:
         red.leerTopologia() # almacena en el archivo topologia.jpg
         return send_file('static/topologia.jpg')
    
 
+
+#|-----Seccion de captura de traps
+@app.post('/routers/<hostname>/interfaces/<interfaz>/estado')
+def capturaTraps(hostname,interfaz):
+    if is_demonio_running():
+        print("El demonio está en ejecución")
+        return "Demonio ejecutandose"
+    else:
+        print("El demonio no se está ejecutando")
+        thread.start()
+        return "Se inicio el monitoreo en el " +hostname +" en la interfaz "+interfaz+"\n"
+
+@app.delete('/routers/<hostname>/interfaces/<interfaz>/estado')
+def capturaTrapsStop(hostname,interfaz):
+    # Establecer la variable de control para detener el hilo
+    detener_hilo = True
+    # Detener el bucle de eventos y finalizar el hilo
+    snmpEngine.transportDispatcher.closeDispatcher()
+    # Esperar a que el hilo termine su ejecución
+    # Detener abruptamente el hilo utilizando Thread.stop()
+    thread.stop()
+    thread.join()
+
+    return "Demonio detenido"
+
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0', port=5020)
+    app.run(debug=True,host='0.0.0.0', port=5000)

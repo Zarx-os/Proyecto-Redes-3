@@ -26,8 +26,8 @@
                     "privilege": "15"
                 },
                 {
-                    "username": "mauri",
-                    "privilege": "14"
+                    "username": "administrado2",
+                    "privilege": "10"
                 }
             ]
         },
@@ -46,6 +46,10 @@
                 {
                     "username": "admin",
                     "privilege": "15"
+                },
+                {
+                    "username": "rede3",
+                    "privilege": "14"
                 }
             ]
         },
